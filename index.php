@@ -263,7 +263,7 @@
             </div>
         </template>
     </div>
-    <script src="assets/js/main.js"></script>
+    <script src="/trans/assets/js/main.js"></script>
 
     <script>
         const {
