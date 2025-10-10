@@ -172,13 +172,13 @@ include __DIR__ . '/../includes/nav.php'; ?>
         <div id="fabMenu"
             class="absolute bottom-10 right-0 mb-2 bg-white rounded-lg shadow-xl scale-0 origin-bottom-right transition-transform duration-200 ease-in-out">
             <div class="py-2 w-64">
-                <a href="/gestion/transaction" class="w-full px-4 py-2 flex items-center space-x-3 hover:bg-gray-100 transition-colors">
+                <a  href="javascript:void(0)" @click="page='add-transaction'" class="w-full px-4 py-2 flex items-center space-x-3 hover:bg-gray-100 transition-colors">
                     <div class="w-8 h-8 bg-secondary rounded-lg flex items-center justify-center">
                         <i class="ri-add-line text-white"></i>
                     </div>
                     <span class="text-sm font-medium text-gray-900">Nouv Transaction</span>
                 </a>
-                <a href="/gestion/multiple-transactions" data-readdy="true"
+                <a href="javascript:void(0)" @click="page='add-multi-transaction'" data-readdy="true"
                     class="w-full px-4 py-2 flex items-center space-x-3 hover:bg-gray-100 transition-colors">
                     <div class="w-8 h-8 bg-secondary rounded-lg flex items-center justify-center">
                         <i class="ri-add-line text-white"></i>
