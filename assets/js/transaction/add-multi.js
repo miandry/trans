@@ -1,13 +1,13 @@
 function initAddMultiTransactionPage() {
   showLoader();
-  const API_ADD_TRANSACTION = "https://miandrilala.online/crud/save";
-  const API_TRANSACTION = "https://miandrilala.online/api/v2/node/transactions";
+  const API_ADD_TRANSACTION = "/crud/save";
+  const API_TRANSACTION = "/api/v2/node/transactions";
   const API_BASE_CLIENTS =
-    "https://miandrilala.online/api/v2/node/client?fields[]=nid&fields[]=field_name&sort[val]=field_name&sort[op]=asc&pager=0&offset=1000";
+    "/api/v2/node/client?fields[]=nid&fields[]=field_name&sort[val]=field_name&sort[op]=asc&pager=0&offset=1000";
   const API_BASE_EXCHANGE =
-    "https://miandrilala.online/api/v2/taxonomy_term/exchange?sort[val]=tid&sort[op]=desc";
+    "/api/v2/taxonomy_term/exchange?sort[val]=tid&sort[op]=desc";
   const API_BASE_CATEGORIES =
-    "https://miandrilala.online/api/v2/taxonomy_term/category?fields[]=tid&fields[]=name&sort[val]=name&sort[op]=asc";
+    "/api/v2/taxonomy_term/category?fields[]=tid&fields[]=name&sort[val]=name&sort[op]=asc";
 
   const amountInput = document.getElementById("amount");
   const transactionsContainer = document.getElementById(

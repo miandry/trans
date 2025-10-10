@@ -170,7 +170,7 @@ function initSignUpPage() {
     showLoader();
     try {
       const response = await fetch(
-        "https://miandrilala.online/api/user/register",
+        "/api/user/register",
         {
           method: "POST",
           headers: {

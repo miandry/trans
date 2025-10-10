@@ -55,7 +55,7 @@ function initSignInPage() {
     showLoader();
     try {
       const response = await fetch(
-        "https://miandrilala.online/api/user/login",
+        "/api/user/login",
         {
           method: "POST",
           headers: {

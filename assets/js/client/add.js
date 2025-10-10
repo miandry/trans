@@ -1,6 +1,6 @@
 function initAddClientPage() {
-  const API_CLIENT = "https://miandrilala.online/api/v2/node/client";
-  const API_ADD_CLIENT = "https://miandrilala.online/crud/save";
+  const API_CLIENT = "/api/v2/node/client";
+  const API_ADD_CLIENT = "/crud/save";
   const editModal = document.getElementById("editModal");
   const deleteModal = document.getElementById("deleteModal");
   const cancelEdit = document.getElementById("cancelEdit");
@@ -196,7 +196,7 @@ function initAddClientPage() {
   async function deleteClient(id) {
     showLoader();
     try {
-      await fetch(`https://miandrilala.online/confirm/node/${id}/delete`, {
+      await fetch(`/confirm/node/${id}/delete`, {
         method: "POST",
       });
       clients = clients.filter((c) => c.nid != id);

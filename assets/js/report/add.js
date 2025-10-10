@@ -1,8 +1,8 @@
 function initAddReportPage() {
-  const API_BASE = "https://miandrilala.online/crud/save";
-  const API_RAPPORT = "https://miandrilala.online/api/v2/node/rapports";
+  const API_BASE = "/crud/save";
+  const API_RAPPORT = "/api/v2/node/rapports";
   const API_BASE_CATEGORIES =
-    "https://miandrilala.online/api/v2/taxonomy_term/category?fields[]=tid&fields[]=name&sort[val]=name&sort[op]=asc";
+    "/api/v2/taxonomy_term/category?fields[]=tid&fields[]=name&sort[val]=name&sort[op]=asc";
 
   let rapports = [];
   let toExport = [];
@@ -20,14 +20,14 @@ function initAddReportPage() {
 
   // client variable
   const API_BASE_CLIENTS =
-    "https://miandrilala.online/api/v2/node/client?fields[]=nid&fields[]=field_name&sort[val]=field_name&sort[op]=asc&pager=0&offset=1000";
+    "/api/v2/node/client?fields[]=nid&fields[]=field_name&sort[val]=field_name&sort[op]=asc&pager=0&offset=1000";
   let allClients = [];
 
   // filter dom
   const sortByDate = document.getElementById("sortByDate");
 
   const API_BASE_EXCHANGE =
-    "https://miandrilala.online/api/v2/taxonomy_term/exchange?sort[val]=tid&sort[op]=desc";
+    "/api/v2/taxonomy_term/exchange?sort[val]=tid&sort[op]=desc";
 
   // Rapport
   const reportModal = document.getElementById("reportModal");
@@ -788,7 +788,7 @@ function initAddReportPage() {
     showLoader();
     try {
       const res = await fetch(
-        `https://miandrilala.online/confirm/node/${id}/delete`,
+        `/confirm/node/${id}/delete`,
         {
           method: "POST",
         }

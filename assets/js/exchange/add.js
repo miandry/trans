@@ -1,6 +1,6 @@
 function initAddExchangePage() {
-  const API_FETCH = "https://miandrilala.online/api/v2/taxonomy_term/exchange";
-  const API_ADD_EXCHANGE = "https://miandrilala.online/crud/save";
+  const API_FETCH = "/api/v2/taxonomy_term/exchange";
+  const API_ADD_EXCHANGE = "/crud/save";
   const editModal = document.getElementById("editModal");
   const deleteModal = document.getElementById("deleteModal");
   const cancelEdit = document.getElementById("cancelEdit");
@@ -159,7 +159,7 @@ function initAddExchangePage() {
     showLoader();
     try {
       await fetch(
-        `https://miandrilala.online/confirm/taxonomy_term/${id}/delete`,
+        `/confirm/taxonomy_term/${id}/delete`,
         { method: "POST" }
       );
       exchanges = exchanges.filter((e) => e.tid != id);

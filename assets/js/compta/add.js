@@ -15,11 +15,11 @@ function initComptaPage() {
   const deleteAllTransactions = document.getElementById("clear-all");
 
   // rapport add
-  const API_BASE = "https://miandrilala.online/crud/save";
+  const API_BASE = "/crud/save";
   const API_BASE_CLIENTS =
-    "https://miandrilala.online/api/v2/node/client?fields[]=nid&fields[]=field_name&sort[val]=field_name&sort[op]=asc&pager=0&offset=1000";
+    "/api/v2/node/client?fields[]=nid&fields[]=field_name&sort[val]=field_name&sort[op]=asc&pager=0&offset=1000";
   const API_BASE_CATEGORIES =
-    "https://miandrilala.online/api/v2/taxonomy_term/category?fields[]=tid&fields[]=name&sort[val]=name&sort[op]=asc";
+    "/api/v2/taxonomy_term/category?fields[]=tid&fields[]=name&sort[val]=name&sort[op]=asc";
   const fabButton = document.getElementById("fabButton");
   const reportModalAdd = document.getElementById("reportModalAdd");
   const addReportForm = document.getElementById("addReportForm");

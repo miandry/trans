@@ -1,7 +1,7 @@
 function initAddCategoryPage() {
   const API_TRANSACTION =
-    "https://miandrilala.online/api/v2/taxonomy_term/category";
-  const API_ADD_CATEGORY = "https://miandrilala.online/crud/save";
+    "/api/v2/taxonomy_term/category";
+  const API_ADD_CATEGORY = "/crud/save";
   const editModal = document.getElementById("editModal");
   const deleteModal = document.getElementById("deleteModal");
   const cancelEdit = document.getElementById("cancelEdit");
@@ -160,7 +160,7 @@ function initAddCategoryPage() {
     showLoader();
     try {
       await fetch(
-        `https://miandrilala.online/confirm/taxonomy_term/${id}/delete`,
+        `/confirm/taxonomy_term/${id}/delete`,
         { method: "POST" }
       );
       categories = categories.filter((c) => c.tid != id);
