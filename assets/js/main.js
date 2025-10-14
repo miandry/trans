@@ -2,6 +2,7 @@ function initMain() {
   // Mobile sidebar script
   const sidebar = document.querySelector("aside");
   const openSidebarBtn = document.getElementById("openSidebar");
+  const asideMenu = document.getElementById("asideMenu");
   const closeSidebarBtn = document.getElementById("closeSidebar");
   function openSidebar() {
     sidebar.classList.remove("-translate-x-full");
@@ -34,9 +35,11 @@ function initMain() {
   if (!sessionStorage.getItem("user")) {
     logoutButton.classList.add("hidden");
     openSidebarBtn.classList.add("hidden");
+    asideMenu.classList.add("hidden");
   } else {
     logoutButton.classList.remove("hidden");
     openSidebarBtn.classList.remove("hidden");
+    asideMenu.classList.remove("hidden");
   }
 
   if (logoutButton && !logoutButton.dataset.bound) {

@@ -3,7 +3,7 @@
     style="z-index: 999;">
     <div class="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
 </div>
-<aside
+<aside id="asideMenu"
     class="w-64 bg-white shadow-lg h-screen fixed left-0 top-0 overflow-y-auto -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out z-10">
     <div class="p-4 border-b flex justify-between items-center">
         <h1 class="font-['Pacifico'] text-xl text-primary">logo</h1>

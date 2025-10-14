@@ -2,7 +2,7 @@
 include __DIR__ . '/../includes/nav.php'; ?>
 
 
-<main class="pb-4 px-4 flex-1 lg:ml-64">
+<main class="pb-4 px-4 flex-1 md:mx-auto md:w-1/2">
     <div class="flex items-center justify-between p-4 lg:hidden bg-white shadow-sm hidden">
         <button id="openSidebar" class="text-gray-500 hover:text-gray-700">
             <div class="w-5 h-5 flex items-center justify-center">
