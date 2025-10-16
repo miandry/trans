@@ -1,18 +1,25 @@
 function initComptaPage() {
   const amountInput = document.getElementById("amount");
-  const feeRateInput = document.getElementById("fee-rate");
   const addBtn = document.getElementById("add-btn");
   const transactionsContainer = document.getElementById(
     "transactions-container"
   );
   const summaryNetEl = document.getElementById("summary-net");
-  const summaryFeesEl = document.getElementById("summary-fees");
   const summaryPositive = document.getElementById("summary-positive");
   const summaryNegative = document.getElementById("summary-negative");
   const transactionCountEl = document.getElementById("transaction-count");
-  const feeAmountEl = document.getElementById("fee-amount");
-  const netAmountEl = document.getElementById("net-amount");
   const deleteAllTransactions = document.getElementById("clear-all");
+  const categorySelect = document.getElementById("categorySelect");
+  const applyFilters = document.getElementById("applyFilters");
+  const startInput = document.getElementById("dateDebut");
+  const endInput = document.getElementById("dateFin");
+  const dateErrMsg = document.getElementById("dateErrMsg");
+  const filterPanel = document.getElementById("filterPanel");
+  const exportExcel = document.getElementById("exportExcel");
+
+  let filteredDate = false;
+  let filterQuery = "all";
+  let toExport;
 
   // rapport add
   const API_BASE = "/crud/save";
@@ -72,24 +79,37 @@ function initComptaPage() {
   }
 
   async function loadSectors() {
+    showLoader();
     try {
       const res = await fetch(API_BASE_CATEGORIES);
       const dataArray = await res.json();
       const categories = dataArray.rows;
 
-      const select = document.getElementById("sector");
+      const sectorSelect = document.getElementById("sector");
+      const categorySelect = document.getElementById("categorySelect");
+
       // Vider les options existantes sauf la première
-      select.innerHTML = '<option value="">Sélectionnez un secteur</option>';
+      sectorSelect.innerHTML =
+        '<option value="">Sélectionnez un secteur</option>';
+      // categorySelect.innerHTML = '<option value="">Sélectionnez une catégorie</option>';
 
       // Ajouter les catégories depuis l'API
       categories.forEach((cat) => {
-        const option = document.createElement("option");
-        option.value = cat.tid; // option value formatée
-        option.textContent = cat.name;
-        select.appendChild(option);
+        // Pour #sector → value = id
+        const optionSector = document.createElement("option");
+        optionSector.value = cat.tid;
+        optionSector.textContent = cat.name;
+        sectorSelect.appendChild(optionSector);
+
+        // Pour #categorySelect → value = nom
+        const optionCategory = document.createElement("option");
+        optionCategory.value = cat.name;
+        optionCategory.textContent = cat.name;
+        categorySelect.appendChild(optionCategory);
       });
     } catch (error) {
       console.error("Erreur lors du chargement des secteurs :", error);
+      hideLoader();
     }
   }
   loadSectors();
@@ -121,11 +141,11 @@ function initComptaPage() {
     }
 
     // montant RMB
-    if (amountRmb.value.trim() === "" || isNaN(amountRmb.value)) {
-      amountRmbError.textContent = "Montant RMB invalide";
-      amountRmbError.classList.remove("hidden");
-      isValid = false;
-    }
+    // if (amountRmb.value.trim() === "" || isNaN(amountRmb.value)) {
+    //     amountRmbError.textContent = "Montant RMB invalide";
+    //     amountRmbError.classList.remove('hidden');
+    //     isValid = false;
+    // }
 
     // secteur
     if (sector.value === "" || sector.value === "0") {
@@ -167,7 +187,7 @@ function initComptaPage() {
         field_client: clientNameRepport,
         field_date: dateRapprotAdd.value,
         field_total_ariary: amountAr.value.trim(),
-        field_total_rmb: amountRmb.value.trim(),
+        field_total_rmb: 0, // amountRmb.value.trim()
         field_description: rDescriptionAdd.value.trim(),
       };
       const res = await fetch(`${API_BASE}`, {
@@ -176,6 +196,7 @@ function initComptaPage() {
       });
 
       if (!res.ok) throw new Error("Échec lors de l'ajout");
+      window.app.page = "add-report";
     } catch (error) {
       console.error("Des erreurs sont survenu :", error);
     } finally {
@@ -187,7 +208,6 @@ function initComptaPage() {
       rDescriptionAdd.value = "";
       reportModalAdd.classList.add("hidden");
       showSuccessToast("Rapport ajouter avec succès");
-      window.app.page = "add-report";
     }
   }
   hideLoader();
@@ -238,19 +258,22 @@ function initComptaPage() {
   // === FILTRES ===
   document.getElementById("filter-all").addEventListener("click", function () {
     setActiveFilter(this);
-    updateTransactionsList("all");
+    filterQuery = "all";
+    updateTransactionsList(filterQuery);
   });
   document
     .getElementById("filter-positive")
     .addEventListener("click", function () {
       setActiveFilter(this);
-      updateTransactionsList("positive");
+      filterQuery = "positive";
+      updateTransactionsList(filterQuery);
     });
   document
     .getElementById("filter-negative")
     .addEventListener("click", function () {
       setActiveFilter(this);
-      updateTransactionsList("negative");
+      filterQuery = "negative";
+      updateTransactionsList(filterQuery);
     });
 
   function setActiveFilter(activeBtn) {
@@ -262,15 +285,38 @@ function initComptaPage() {
     activeBtn.classList.replace("text-gray-600", "text-white");
   }
 
+  function sameDayFilter(data, start, end) {
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+
+    return data.filter((item) => {
+      const d = new Date(item.date);
+      return d >= startDate && d <= endDate;
+    });
+  }
+
   // === AFFICHAGE ===
   function updateTransactionsList(filter = "all") {
     transactionsContainer.innerHTML = "";
     let filteredTransactions = transactions;
-    if (filter === "positive") {
-      filteredTransactions = transactions.filter((t) => t.amount >= 0);
-    } else if (filter === "negative") {
-      filteredTransactions = transactions.filter((t) => t.amount < 0);
+    if (filteredDate) {
+      const start = startInput.value ? new Date(startInput.value) : null;
+      const end = endInput.value ? new Date(endInput.value) : null;
+      filteredTransactions = sameDayFilter(filteredTransactions, start, end);
     }
+    if (filter === "positive") {
+      filteredTransactions = filteredTransactions.filter((t) => t.amount >= 0);
+    } else if (filter === "negative") {
+      filteredTransactions = filteredTransactions.filter((t) => t.amount < 0);
+    }
+    toExport = filteredTransactions;
+    console.log(toExport);
+    if (toExport.length > 0) {
+      exportExcel.classList.remove("hidden");
+    } else {
+      exportExcel.classList.add("hidden");
+    }
+    updateSummary(filteredTransactions);
     if (filteredTransactions.length === 0) {
       transactionsContainer.innerHTML = `
                     <div class="text-center py-8 text-gray-500">
@@ -301,12 +347,9 @@ function initComptaPage() {
                         ).toLocaleString("fr-FR")}</span>
                     </div>
                     <div class="flex justify-between items-center">
-                        <span class="text-red-500">Frais: ${formatCurrency(
-                          transaction.fee
-                        )}</span>
-                        <span class="text-green-600">Montant: ${formatCurrency(
-                          transaction.net
-                        )}</span>
+                        <span class="text-red-500">Catégorie: ${
+                          transaction.categorie
+                        }</span>
                     </div>`;
       transactionsContainer.appendChild(transactionEl);
 
@@ -328,35 +371,40 @@ function initComptaPage() {
     );
   }
 
-  function calculateFee(amount) {
-    const feeRate = parseFloat(feeRateInput.value) / 100 || 0;
-    const fee = amount * feeRate;
-    return { fee, net: amount };
-  }
-
   function updatePreviewValues() {
     const amount = parseFloat(amountInput.value) || 0;
-    const { fee, net } = calculateFee(amount);
-    feeAmountEl.textContent = formatCurrency(fee);
-    netAmountEl.textContent = formatCurrency(net);
   }
 
-  function updateSummary() {
-    const total = transactions.reduce((sum, t) => sum + t.amount, 0);
-    const fees = transactions.reduce((sum, t) => sum + t.fee, 0);
-    const net = total - fees;
-    const pos = transactions
-      .filter((t) => t.amount > 0)
-      .reduce((sum, t) => sum + t.amount, 0);
-    const neg = transactions
-      .filter((t) => t.amount < 0)
-      .reduce((sum, t) => sum + t.amount, 0);
+  function updateSummary(data = null) {
+    let total;
+    let net;
+    let pos;
+    let neg;
+    if (data) {
+      total = data.reduce((sum, t) => sum + t.amount, 0);
+      net = total;
+      pos = data
+        .filter((t) => t.amount > 0)
+        .reduce((sum, t) => sum + t.amount, 0);
+      neg = data
+        .filter((t) => t.amount < 0)
+        .reduce((sum, t) => sum + t.amount, 0);
+      transactionCountEl.textContent = data.length;
+    } else {
+      total = transactions.reduce((sum, t) => sum + t.amount, 0);
+      net = total;
+      pos = transactions
+        .filter((t) => t.amount > 0)
+        .reduce((sum, t) => sum + t.amount, 0);
+      neg = transactions
+        .filter((t) => t.amount < 0)
+        .reduce((sum, t) => sum + t.amount, 0);
+      transactionCountEl.textContent = transactions.length;
+    }
 
     summaryNetEl.textContent = formatCurrency(net);
-    summaryFeesEl.textContent = formatCurrency(fees);
     summaryPositive.textContent = formatCurrency(pos);
     summaryNegative.textContent = formatCurrency(neg);
-    transactionCountEl.textContent = transactions.length;
   }
 
   // === LOCAL STORAGE ===
@@ -371,12 +419,10 @@ function initComptaPage() {
 
   // === AJOUT ===
   function addTransaction(amount) {
-    const { fee, net } = calculateFee(amount);
     const newTransaction = {
       id: Date.now().toString(),
       amount,
-      fee,
-      net,
+      categorie: categorySelect.value,
       date: new Date().toISOString(),
     };
     transactions.unshift(newTransaction);
@@ -403,20 +449,138 @@ function initComptaPage() {
     updateSummary();
   });
 
+  // --- Validation des montants ---
+  function validateAmounts(inputText) {
+    let isValid = true;
+    const lines = inputText
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line !== "");
+
+    const validAmounts = [];
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const amount = parseFloat(line.replace(",", "."));
+      // autorise montants négatifs
+      if (!isNaN(amount)) {
+        validAmounts.push(amount);
+      } else {
+        isValid = false;
+        break;
+      }
+    }
+
+    return { validAmounts, isValid };
+  }
+
   // === ÉVÉNEMENTS ===
   addBtn.addEventListener("click", () => {
-    const value = parseFloat(amountInput.value);
-    if (isNaN(value) || value === 0) return;
-    addTransaction(value);
-    amountInput.value = "";
-    updatePreviewValues();
+    const value = amountInput.value;
+    if (!value.trim()) return;
+    const errorDiv = document.getElementById("errorMessages");
+    const { validAmounts, isValid } = validateAmounts(amountInput.value);
+
+    if (!isValid) {
+      errorDiv.classList.remove("hidden");
+      return;
+    } else {
+      // Tout est valide → ajouter chaque transaction
+      validAmounts.forEach((amount) => addTransaction(amount));
+      amountInput.value = "";
+      updatePreviewValues();
+    }
+  });
+
+  function validateDates() {
+    const start = startInput.value ? new Date(startInput.value) : null;
+    const end = endInput.value ? new Date(endInput.value) : null;
+
+    // Par défaut, on cache l'erreur
+    dateErrMsg.classList.add("hidden");
+    dateErrMsg.textContent = "";
+
+    // Vérifie si les deux dates sont remplies
+    if (!start || !end) {
+      dateErrMsg.textContent = "Les deux dates doivent être renseignées.";
+      dateErrMsg.classList.remove("hidden");
+      return false;
+    }
+
+    // Vérifie si la date de début est antérieure ou égale à la date de fin
+    if (start > end) {
+      dateErrMsg.textContent =
+        "La date de début doit être antérieure ou égale à la date de fin.";
+      dateErrMsg.classList.remove("hidden");
+      return false;
+    }
+
+    return true;
+  }
+
+  applyFilters.addEventListener("click", async () => {
+    let validDate = validateDates();
+    if (!validDate) {
+      return;
+    }
+    filteredDate = true;
+    updateTransactionsList(filterQuery);
+    filterPanel.classList.remove("active");
+  });
+
+  document.getElementById("exportExcel").addEventListener("click", () => {
+    // 🔹 En-têtes
+    const data = [["Date", "Catégorie", "Montant"]];
+
+    // 🔹 Données
+    let total = 0;
+    toExport.forEach((item) => {
+      const formattedDate = new Date(item.date).toLocaleDateString("fr-FR");
+      data.push([formattedDate, item.categorie, item.amount]);
+      total += item.amount;
+    });
+
+    // 🔹 Ligne du total
+    data.push([]);
+    data.push(["", "TOTAL", total]);
+
+    // 🔹 Créer la feuille Excel
+    const ws = XLSX.utils.aoa_to_sheet(data);
+
+    // 🔹 Ajuster la largeur des colonnes
+    ws["!cols"] = [
+      { wch: 15 }, // Date
+      { wch: 25 }, // Catégorie
+      { wch: 18 }, // Montant
+    ];
+
+    // 🔹 Créer et exporter le fichier Excel
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Compta");
+
+    // 🔹 Nom du fichier : compta-AAAA-MM-JJ.xlsx
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    const dd = String(now.getDate()).padStart(2, "0");
+    const filename = `compta-${yyyy}-${mm}-${dd}.xlsx`;
+
+    XLSX.writeFile(wb, filename);
   });
 
   amountInput.addEventListener("input", updatePreviewValues);
-  feeRateInput.addEventListener("input", updatePreviewValues);
 
   // === INITIALISATION ===
   updateTransactionsList();
   updateSummary();
   updatePreviewValues();
+
+  const filterBtn = document.getElementById("filterBtn");
+  const closeFilterBtn = document.getElementById("closeFilterBtn");
+  filterBtn.addEventListener("click", function () {
+    filterPanel.classList.add("active");
+  });
+  closeFilterBtn.addEventListener("click", function () {
+    filterPanel.classList.remove("active");
+  });
 }

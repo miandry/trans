@@ -56,7 +56,7 @@ include __DIR__ . '/../includes/nav.php'; ?>
                             <p id="sectorError" class="text-red-500 text-xs mt-2 hidden"></p>
                         </div>
                     </div>
-                    <div class="mb-4">
+                    <div class="mb-4 hidden">
                         <label for="amountRmb" class="block text-sm font-medium text-gray-700 mb-1">Solde
                             (RMB)</label>
                         <div class="relative">
@@ -107,6 +107,41 @@ include __DIR__ . '/../includes/nav.php'; ?>
     </div>
 </div>
 
+<!--     filtre     -->
+<div id="filterPanel" class="fixed top-0 left-0 right-0 bg-white shadow-lg z-50 filter-panel">
+    <div class="px-4 py-3 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-gray-900">Filtres avancés</h2>
+            <button id="closeFilterBtn" class="w-8 h-8 flex items-center justify-center cursor-pointer">
+                <i class="ri-close-line text-gray-600"></i>
+            </button>
+        </div>
+    </div>
+    <div class="px-4 py-4 max-h-96 overflow-y-auto">
+        <div class="space-y-6 mb-4">
+            <div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2" for="dateDebut">Date début</label>
+                    <input type="date" id="dateDebut"
+                        class="w-full p-2 border border-gray-300 rounded-button focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none text-sm">
+                </div>
+            </div>
+        </div>
+        <div class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2" for="dateFin">Date fin</label>
+                <input type="date" id="dateFin"
+                    class="w-full p-2 border border-gray-300 rounded-button focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none text-sm">
+
+                <p id="dateErrMsg" class="text-red-500 text-xs mt-2 hidden"></p>
+            </div>
+        </div>
+    </div>
+    <div class="px-4 py-4 border-t border-gray-200 flex gap-3">
+        <button id="applyFilters"
+            class="flex-1 py-2.5 bg-primary text-white rounded-lg text-sm font-medium cursor-pointer !rounded-button">Appliquer</button>
+    </div>
+</div>
 
 <!-- Main Content -->
 <main class="pb-4 px-4 flex-1 lg:ml-64">
@@ -117,40 +152,38 @@ include __DIR__ . '/../includes/nav.php'; ?>
             </div>
         </button>
         <h1 class="font-['Pacifico'] text-xl text-primary">logo</h1>
-        <div class="w-5"></div>
+        <div class="w-5">
+            <button id="filterBtn" class="text-gray-500 hover:text-gray-700 cursor-pointer">
+                <i class="ri-filter-3-line text-gray-600"></i>
+            </button>
+        </div>
     </div>
     <!-- Input Section -->
     <div class="bg-white rounded-lg shadow-md p-5 mt-4">
         <div class="mb-4">
-            <label for="fee-rate" class="block text-sm font-medium text-gray-700 mb-1">Taux de frais (%)</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Catégorie</label>
             <div class="relative">
-                <input type="number" id="fee-rate"
-                    class="w-full p-2 border border-gray-300 rounded-button focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none text-sm"
-                    value="0.20" min="0" max="100" step="0.01" />
-                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                    <span class="text-gray-500">%</span>
+                <select id="categorySelect"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-button text-sm focus:outline-none focus:ring-2 focus:ring-primary appearance-none bg-white">
+                </select>
+                <div
+                    class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center">
+                    <i class="ri-arrow-down-s-line text-gray-500"></i>
                 </div>
             </div>
         </div>
         <div class="mb-4">
             <label for="amount" class="block text-sm font-medium text-gray-700 mb-1">Montant à insérer</label>
             <div class="relative">
-                <input type="number" id="amount"
-                    class="w-full p-2 border border-gray-300 rounded-button focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none text-sm"
-                    placeholder="Entrez le montant" />
+                <textarea rows="3" id="amount" placeholder="Saisis un montant par ligne"
+                    class="w-full p-2 border border-gray-300 rounded-button focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none text-sm"></textarea>
+
                 <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                     <span class="text-gray-500">Ar</span>
                 </div>
-            </div>
-        </div>
-        <div class="flex justify-between items-center mb-4 p-3 bg-gray-50 rounded-md fs-c-7">
-            <div>
-                <p class="text-sm text-gray-600">Frais additionnels (0,20%)</p>
-                <p id="fee-amount" class="text-red-500 font-medium">0 Ar</p>
-            </div>
-            <div>
-                <p class="text-sm text-gray-600">Montant</p>
-                <p id="net-amount" class="text-green-600 font-medium">0 Ar</p>
+                <div id="errorMessages" class="hidden">
+                    <p class="text-red-500 text-xs mt-2">Caractères invalide</p>
+                </div>
             </div>
         </div>
         <button id="add-btn"
@@ -215,15 +248,17 @@ include __DIR__ . '/../includes/nav.php'; ?>
             <span class="text-gray-600">Total négatif</span>
             <span id="summary-negative" class="font-medium text-secondary">0 Ar</span>
         </div>
-        <div class="flex justify-between items-center mb-1 fs-c-7">
-            <span class="text-gray-600">Total des frais</span>
-            <span id="summary-fees" class="font-medium text-red-500">0 Ar</span>
-        </div>
         <div class="flex justify-between items-center fs-c-7">
             <span class="font-medium text-gray-700">Solde disponible</span>
             <span id="summary-net" class="font-semibold text-primary">0 Ar</span>
         </div>
     </div>
+</div>
+<div class="fixed bottom-40 right-6 z-30">
+    <button id="exportExcel"
+        class="w-10 h-10 bg-purple-500 hover:bg-primary-dark shadow-lg rounded-full flex items-center justify-center cursor-pointer transition-transform duration-200 hidden">
+        <i class="ri-upload-2-line text-white text-2xl"></i>
+    </button>
 </div>
 <div class="fixed bottom-28 right-6 z-30">
     <button id="fabButton"

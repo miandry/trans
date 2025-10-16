@@ -450,18 +450,8 @@ function initAddReportPage() {
                                     <div class="col-span-5 text-right fs-c-7">
                                         <div class="text-gray-500">
                                         </div>
-                                        <div class="text-green-600" data-select="rmb-${
-                                          r.nid
-                                        }">${formatCurrency(
-        r.field_total_rmb,
-        "RMB"
-      )}</div>
-                                        <div class="text-purple-600 mt-1" data-select="ar-${
-                                          r.nid
-                                        }">${formatCurrency(
-        r.field_total_ariary,
-        "AR"
-      )}</div>
+                                        <div class="text-green-600" data-select="rmb-${r.nid}">${r.field_total_rmb == 0 ? "" : formatCurrency(r.field_total_rmb, "RMB")}</div>
+                                        <div class="text-purple-600 mt-1" data-select="ar-${r.nid}">${formatCurrency(r.field_total_ariary,"AR")}</div>
                                     </div>
                                 </div>
                             </div>`;
