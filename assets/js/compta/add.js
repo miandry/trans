@@ -289,6 +289,10 @@ function initComptaPage() {
     const startDate = new Date(start);
     const endDate = new Date(end);
 
+    if (!start && !end) {
+      return data;
+    }
+
     return data.filter((item) => {
       const d = new Date(item.date);
       return d >= startDate && d <= endDate;
@@ -310,7 +314,6 @@ function initComptaPage() {
       filteredTransactions = filteredTransactions.filter((t) => t.amount < 0);
     }
     toExport = filteredTransactions;
-    console.log(toExport);
     if (toExport.length > 0) {
       exportExcel.classList.remove("hidden");
     } else {
@@ -496,18 +499,23 @@ function initComptaPage() {
     const start = startInput.value ? new Date(startInput.value) : null;
     const end = endInput.value ? new Date(endInput.value) : null;
 
-    // Par défaut, on cache l'erreur
+    // On cache toujours le message d'erreur au départ
     dateErrMsg.classList.add("hidden");
     dateErrMsg.textContent = "";
 
-    // Vérifie si les deux dates sont remplies
-    if (!start || !end) {
+    // Si les deux dates sont vides → on laisse passer
+    if (!start && !end) {
+      return true;
+    }
+
+    // Si une seule des deux est saisie → erreur
+    if ((!start && end) || (start && !end)) {
       dateErrMsg.textContent = "Les deux dates doivent être renseignées.";
       dateErrMsg.classList.remove("hidden");
       return false;
     }
 
-    // Vérifie si la date de début est antérieure ou égale à la date de fin
+    // Vérifie si la date de début est avant ou égale à la date de fin
     if (start > end) {
       dateErrMsg.textContent =
         "La date de début doit être antérieure ou égale à la date de fin.";
