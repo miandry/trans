@@ -116,7 +116,6 @@ function initMain() {
   });
 
   (function () {
-    alert('jj22')
     /************ Bloquer zoom clavier et roulette ************/
     window.addEventListener(
       "keydown",
