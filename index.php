@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Gestion Ariary</title>
     <script src="https://cdn.tailwindcss.com/3.4.16"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
@@ -93,6 +93,16 @@
             font-family: 'Poppins', sans-serif;
             background-color: #f9fafb;
             /* font-size: 0.875rem; */
+        }
+
+        html,
+        body {
+            touch-action: pan-x pan-y;
+            /* scroll normal mais pas pinch/zoom */
+            overscroll-behavior: contain;
+            /* empêche le bounce sur mobile si besoin */
+            max-width: 100vw;
+            overflow-x: hidden;
         }
 
         input::-webkit-outer-spin-button,

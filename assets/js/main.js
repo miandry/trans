@@ -115,115 +115,75 @@ function initMain() {
     button.dataset.accordionBound = "true";
   });
 
-  /****************************************************************
-   * 1) Bloquer ctrl/cmd + plus/minus/0 et roulette avec ctrl
-   ****************************************************************/
-  window.addEventListener(
-    "keydown",
-    function (e) {
-      // e.key: "=", "-", "0", "+"; on checke aussi e.code
-      const isCtrl = e.ctrlKey || e.metaKey; // ctrl (Windows) ou cmd (Mac)
-      if (isCtrl) {
-        // Bloquer +, -, =, 0 (différentes claviers peuvent envoyer "=" pour +)
-        if (e.key === "+" || e.key === "-" || e.key === "=" || e.key === "0") {
-          e.preventDefault();
-          e.stopPropagation();
-          return false;
-        }
-        // Bloquer Ctrl + Mousewheel is handled in wheel listener below
-      }
-    },
-    { passive: false }
-  );
-
-  // Bloquer la roulette quand ctrl/cmd est pressé
-  window.addEventListener(
-    "wheel",
-    function (e) {
-      if (e.ctrlKey || e.metaKey) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
-    },
-    { passive: false }
-  );
-
-  /****************************************************************
-   * 2) Empêcher le pinch-zoom sur mobile / iOS / Android
-   *    - "gesturestart" est iOS Safari specific
-   *    - On empêche le double-tap zoom et le pinch en interceptant touch events
-   ****************************************************************/
-  // iOS Safari: gesturestart
-  window.addEventListener(
-    "gesturestart",
-    function (e) {
-      e.preventDefault();
-    },
-    { passive: false }
-  );
-
-  // Empêcher le double tap zoom (trick: bloquer double tap rapid)
   (function () {
+    alert('jj22')
+    /************ Bloquer zoom clavier et roulette ************/
+    window.addEventListener(
+      "keydown",
+      function (e) {
+        const isCtrl = e.ctrlKey || e.metaKey;
+        if (isCtrl && ["+", "-", "=", "0"].includes(e.key)) {
+          e.preventDefault();
+        }
+        if (["ArrowLeft", "ArrowRight"].includes(e.key)) {
+          e.preventDefault();
+        }
+      },
+      { passive: false }
+    );
+
+    window.addEventListener(
+      "wheel",
+      function (e) {
+        if (e.ctrlKey || e.metaKey) e.preventDefault();
+      },
+      { passive: false }
+    );
+
+    /************ Bloquer pinch, double-tap et gestures ************/
     let lastTouch = 0;
+
+    window.addEventListener(
+      "touchstart",
+      function (e) {
+        if (e.touches.length > 1) {
+          // Plus d’un doigt -> blocage pinch/rotation
+          e.preventDefault();
+        }
+      },
+      { passive: false }
+    );
+
     window.addEventListener(
       "touchend",
       function (e) {
         const now = Date.now();
         if (now - lastTouch <= 300) {
-          // double-tap détecté -> empêcher
+          // double-tap détecté
           e.preventDefault();
         }
         lastTouch = now;
       },
       { passive: false }
     );
+
+    window.addEventListener(
+      "gesturestart",
+      function (e) {
+        // iOS Safari
+        e.preventDefault();
+      },
+      { passive: false }
+    );
+
+    /************ Sécurité : corps ne dépasse pas viewport ************/
+    function clampBodyWidth() {
+      document.documentElement.style.overflowX = "hidden";
+      document.body.style.overflowX = "hidden";
+      document.body.style.maxWidth = "100vw";
+    }
+
+    clampBodyWidth();
+    window.addEventListener("resize", clampBodyWidth);
   })();
-
-  // Empêcher pinch (deux doigts) — on peut repérer touchmove avec 2 touches
-  window.addEventListener(
-    "touchmove",
-    function (e) {
-      if (e.touches && e.touches.length > 1) {
-        // si plus d'un doigt, c'est probablement un pinch ou rotation -> bloquer
-        e.preventDefault();
-      } else {
-        // possibilité de bloquer le défilement horizontal: regarder le déplacement X vs Y
-        // si vous voulez empêcher tout mouvement horizontal sur un touch simple, décommentez ci-dessous.
-        //
-        // const touch = e.touches[0];
-        // // besoin de logique additionnelle pour déterminer dx/dy — laissé simple ici
-      }
-    },
-    { passive: false }
-  );
-
-  /****************************************************************
-   * 3) Optionnel : Empêcher scroll horizontal par clavier (flèche gauche/droite, space)
-   ****************************************************************/
-  window.addEventListener(
-    "keydown",
-    function (e) {
-      // Flèches gauche/droite, Home, End, PageUp/PageDown, espace (parfois) provoquent déplacement
-      const blockedKeys = ["ArrowLeft", "ArrowRight"];
-      if (blockedKeys.includes(e.key)) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
-    },
-    { passive: false }
-  );
-
-  /****************************************************************
-   * 4) Sécurité : s'assurer que body ne dépasse pas largeur viewport
-   ****************************************************************/
-  function clampBodyWidth() {
-    document.documentElement.style.overflowX = "hidden";
-    document.body.style.overflowX = "hidden";
-    document.body.style.maxWidth = "100vw";
-  }
-  // initial + on resize
-  clampBodyWidth();
-  window.addEventListener("resize", clampBodyWidth);
 }
