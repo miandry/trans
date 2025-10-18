@@ -404,7 +404,7 @@ function initComptaPage() {
         .reduce((sum, t) => sum + t.amount, 0);
       transactionCountEl.textContent = transactions.length;
     }
-
+    amountAr.value = net;
     summaryNetEl.textContent = formatCurrency(net);
     summaryPositive.textContent = formatCurrency(pos);
     summaryNegative.textContent = formatCurrency(neg);
